@@ -1,0 +1,88 @@
+// File: prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+  output = "../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String         @id @default(cuid())
+  email               String         @unique
+  name                String?
+  password            String
+  role                String         @default("TEACHER") // "ADMIN" or "TEACHER"
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  documents           Document[]
+  announcements       Announcement[]
+  messages            Message[]
+  receivedAnnouncements Announcement[] @relation("AnnouncementRecipients")
+  unreadMessageCount  Int            @default(0)
+  lastLoginAt         DateTime?
+  isActive           Boolean         @default(true)
+  // New teacher-specific fields
+  gruppenanzahl      Int?           // Number of groups
+  teilnehmeranzahl   Int?           // Number of participants
+  notes              String?        // Notes about the teacher
+  hasNewMessage      Boolean        @default(false)
+  hasNewAnnouncement Boolean        @default(false)
+  //PW reset tokenstuff
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+}
+
+model Folder {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  parentId    String?    // For nested folders
+  parent      Folder?    @relation("FolderToFolder", fields: [parentId], references: [id])
+  subFolders  Folder[]   @relation("FolderToFolder")
+  documents   Document[]
+}
+
+model Document {
+  id            String    @id @default(cuid())
+  title         String
+  fileUrl       String
+  fileSize      Int
+  type          String   // "TRAINING" or "PERSONAL"
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id])
+  // New fields
+  folderId      String?
+  folder        Folder?  @relation(fields: [folderId], references: [id])
+  skillLevel    Int?      @default(1)  // 1-5 or whatever range you prefer
+  requirements  String?  // Minimum 20 chars for requirements
+}
+
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  fileUrl     String?
+  isGlobal    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  recipients  User[]   @relation("AnnouncementRecipients")
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  content     String
+  createdAt   DateTime @default(now())
+  isRead      Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  isFromAdmin Boolean  @default(false)
+}
