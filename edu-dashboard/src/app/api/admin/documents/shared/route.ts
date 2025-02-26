@@ -26,7 +26,7 @@ export async function POST(req: Request) {
         title,
         fileUrl,
         fileSize,
-        type: "PERSONAL",
+        type: "SHARED_ADMIN",
         userId: teacherId 
       }})
     })

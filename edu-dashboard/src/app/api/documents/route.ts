@@ -19,7 +19,7 @@ export async function POST(req: Request) {
         title,
         fileUrl,
         fileSize,
-        type: type || "PERSONAL",
+        type: "PERSONAL",
         userId: session.user.id
       }
     })

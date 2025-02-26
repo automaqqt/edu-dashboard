@@ -13,12 +13,13 @@ import { Button } from "@/components/ui/button"
 import { ArrowUpDown } from "lucide-react"
 
 interface Teacher {
-  id: string
-  name: string | null
-  email: string
-  gruppenanzahl: number | null
-  teilnehmeranzahl: number | null
-}
+    id: string
+    name: string | null
+    email: string
+    gruppenanzahl: number | null
+    teilnehmeranzahl: number | null
+    lastLoginAt: Date | null
+  }
 
 interface TeacherStatsTableProps {
   teachers: Teacher[]
@@ -72,6 +73,7 @@ export function TeacherStatsTable({ teachers }: TeacherStatsTableProps) {
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           </TableHead>
+          <TableHead>Letzte Anmeldung</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -81,6 +83,7 @@ export function TeacherStatsTable({ teachers }: TeacherStatsTableProps) {
             <TableCell>{teacher.email}</TableCell>
             <TableCell>{teacher.gruppenanzahl || 0}</TableCell>
             <TableCell>{teacher.teilnehmeranzahl || 0}</TableCell>
+            <TableCell>{teacher.lastLoginAt ? teacher.lastLoginAt.toLocaleDateString() : "Kein Datum verfügbar"}</TableCell>
           </TableRow>
         ))}
       </TableBody>

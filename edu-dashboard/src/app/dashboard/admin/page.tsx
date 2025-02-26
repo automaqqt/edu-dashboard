@@ -13,10 +13,11 @@ async function getAdminStats() {
       email: true,
       gruppenanzahl: true,
       teilnehmeranzahl: true,
+      lastLoginAt: true,
     }
   })
 
-  const totals = teachers.reduce((acc: { totalGroups: any; totalParticipants: any }, teacher: { gruppenanzahl: any; teilnehmeranzahl: any }) => ({
+  const totals = teachers.reduce((acc: { totalGroups: any; totalParticipants: any }, teacher: { gruppenanzahl: any; teilnehmeranzahl: any, lastLoginAt:any }) => ({
     totalGroups: acc.totalGroups + (teacher.gruppenanzahl || 0),
     totalParticipants: acc.totalParticipants + (teacher.teilnehmeranzahl || 0),
   }), { totalGroups: 0, totalParticipants: 0 })

@@ -3,6 +3,8 @@
 import { useQuery } from "@tanstack/react-query"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button"
+import { Printer } from "lucide-react"
 
 interface Announcement{
   id:number,
@@ -11,6 +13,7 @@ interface Announcement{
   content: string,
   fileUrl: string,
 }
+
 export function AnnouncementsList() {
   const { data: announcements, isLoading } = useQuery<Announcement[]>({
     queryKey: ["announcements"],
@@ -20,6 +23,10 @@ export function AnnouncementsList() {
     }
   })
 
+  const handlePrint = (fileUrl: string) => {
+    window.open(fileUrl, '_blank')?.print()
+  }
+
   if (isLoading) {
     return <Skeleton />
   }
@@ -28,24 +35,27 @@ export function AnnouncementsList() {
     <div className="space-y-4">
       {announcements?.map((announcement) => (
         <Card key={announcement.id}>
-          <CardHeader>
-            <CardTitle>{announcement.title}</CardTitle>
-            <div className="text-sm text-muted-foreground">
-              {new Date(announcement.createdAt).toLocaleDateString()}
+          <CardHeader className="flex flex-row items-start justify-between">
+            <div>
+              <CardTitle>{announcement.title}</CardTitle>
+              <div className="text-sm text-muted-foreground">
+                {new Date(announcement.createdAt).toLocaleDateString()}
+              </div>
             </div>
+            {announcement.fileUrl && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="ml-auto"
+                onClick={() => handlePrint(announcement.fileUrl)}
+              >
+                <Printer className="h-4 w-4 mr-2" />
+                Print
+              </Button>
+            )}
           </CardHeader>
           <CardContent>
             <p>{announcement.content}</p>
-            {announcement.fileUrl && (
-              <a
-                href={announcement.fileUrl}
-                className="text-primary hover:underline mt-2 inline-block"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View attachment
-              </a>
-            )}
           </CardContent>
         </Card>
       ))}

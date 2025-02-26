@@ -42,6 +42,11 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
+        await db.user.update({
+          where: { id: user.id },
+          data: { lastLoginAt: new Date() }
+        })
+
         return {
           id: user.id,
           email: user.email,

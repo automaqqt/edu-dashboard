@@ -28,9 +28,6 @@ export function StatsCards({ stats }: StatsCardsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.gruppenanzahl}</div>
-          <p className="text-xs text-muted-foreground">
-            Rank {stats.groupRank} of {stats.totalTeachers}
-          </p>
         </CardContent>
       </Card>
       <Card>
@@ -40,9 +37,6 @@ export function StatsCards({ stats }: StatsCardsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.teilnehmeranzahl}</div>
-          <p className="text-xs text-muted-foreground">
-            Rank {stats.participantRank} of {stats.totalTeachers}
-          </p>
         </CardContent>
       </Card>
       {/* Add other cards as needed */}

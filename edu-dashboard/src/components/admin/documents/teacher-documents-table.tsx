@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import {
   Table,
@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { Download, Trash2, Search } from "lucide-react"
+import { Download, Trash2, Search, FilterX } from "lucide-react"
 import { formatBytes } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
 import {
@@ -26,13 +26,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu"
+import { TeacherFilter } from "./teacher-filter" // Import the new component
 
 interface Document {
   id: string
@@ -54,7 +48,7 @@ export function TeacherDocumentsTable() {
   const [search, setSearch] = useState("")
   const [userFilter, setUserFilter] = useState<string | null>(null)
 
-  const { data: documents, refetch } = useQuery<Document[]>({
+  const { data: documents, refetch, isLoading } = useQuery<Document[]>({
     queryKey: ["admin-documents"],
     queryFn: async () => {
       const response = await fetch("/api/admin/documents/all")
@@ -84,24 +78,68 @@ export function TeacherDocumentsTable() {
       })
     }
   }
-
-  // Filter documents based on search and user filter
-  const filteredDocuments = documents?.filter(doc => {
-    const matchesSearch = doc.title.toLowerCase().includes(search.toLowerCase()) ||
-      doc.user.name.toLowerCase().includes(search.toLowerCase()) ||
-      doc.user.email.toLowerCase().includes(search.toLowerCase())
-    
-    const matchesUser = !userFilter || doc.user.id === userFilter
-
-    return matchesSearch && matchesUser
-  })
+  console.log(documents)
 
   // Get unique users for filter
-  const users = [...new Set(documents?.map(doc => doc.user) || [])]
+  const uniqueUsers = useMemo(() => {
+    if (!documents) return []
+    
+    // Create a map to store unique users by ID
+    const userMap = new Map()
+    
+    documents.forEach(doc => {
+      if (!userMap.has(doc.user.id)) {
+        userMap.set(doc.user.id, doc.user)
+      }
+    })
+    
+    return Array.from(userMap.values())
+  }, [documents])
+
+  // Filter documents based on search and user filter
+  const filteredDocuments = useMemo(() => {
+    if (!documents) return []
+    
+    return documents.filter(doc => {
+      const matchesSearch = 
+        doc.title.toLowerCase().includes(search.toLowerCase()) ||
+        doc.user.name.toLowerCase().includes(search.toLowerCase()) ||
+        doc.user.email.toLowerCase().includes(search.toLowerCase())
+      
+      const matchesUser = !userFilter || doc.user.id === userFilter
+
+      return matchesSearch && matchesUser
+    })
+  }, [documents, search, userFilter])
+
+  const selectedTeacher = userFilter 
+    ? uniqueUsers.find(user => user.id === userFilter)
+    : null
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex items-center gap-2">
+          <TeacherFilter 
+            users={uniqueUsers}
+            selectedUserId={userFilter}
+            onChange={setUserFilter}
+          />
+          
+          {(search || userFilter) && (
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={() => {
+                setSearch("")
+                setUserFilter(null)
+              }}
+              title="Clear filters"
+            >
+              <FilterX className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
         <div className="relative flex-1">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -111,30 +149,15 @@ export function TeacherDocumentsTable() {
             className="pl-8"
           />
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              {userFilter 
-                ? users.find(u => u.id === userFilter)?.name || "All Teachers"
-                : "All Teachers"}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Filter by Teacher</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => setUserFilter(null)}>
-              All Teachers
-            </DropdownMenuItem>
-            {users.map((user) => (
-              <DropdownMenuItem
-                key={user.id}
-                onClick={() => setUserFilter(user.id)}
-              >
-                {user.name}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        
+        
       </div>
+
+      {userFilter && (
+        <div className="text-sm text-muted-foreground">
+          Showing documents from teacher: <span className="font-medium">{selectedTeacher?.name}</span>
+        </div>
+      )}
 
       <div className="rounded-md border">
         <Table>
@@ -149,59 +172,76 @@ export function TeacherDocumentsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredDocuments?.map((doc) => (
-              <TableRow key={doc.id}>
-                <TableCell className="font-medium">{doc.title}</TableCell>
-                <TableCell>{doc.user.name}</TableCell>
-                <TableCell>{doc.type === "SHARED_ADMIN" ? "Admin Shared" : "Private"}</TableCell>
-                <TableCell>{formatBytes(doc.fileSize)}</TableCell>
-                <TableCell>
-                  {new Date(doc.updatedAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        const link = document.createElement('a')
-                        link.href = doc.fileUrl
-                        link.download = doc.title
-                        document.body.appendChild(link)
-                        link.click()
-                        document.body.removeChild(link)
-                      }}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Document</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete this document? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(doc.id)}
-                            className="bg-red-500 hover:bg-red-600"
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="h-24 text-center">
+                  Loading documents...
                 </TableCell>
               </TableRow>
-            ))}
+            ) : filteredDocuments.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="h-24 text-center">
+                  No documents found
+                  {(search || userFilter) && (
+                    <span> with the current filters</span>
+                  )}
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredDocuments.map((doc) => (
+                <TableRow key={doc.id}>
+                  <TableCell className="font-medium">{doc.title}</TableCell>
+                  <TableCell>{doc.user.name}</TableCell>
+                  <TableCell>{doc.type === "SHARED_ADMIN" ? "Admin Shared" : "Private"}</TableCell>
+                  <TableCell>{formatBytes(doc.fileSize)}</TableCell>
+                  <TableCell>
+                    {new Date(doc.updatedAt).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const link = document.createElement('a')
+                          link.href = doc.fileUrl
+                          link.download = doc.title
+                          document.body.appendChild(link)
+                          link.click()
+                          document.body.removeChild(link)
+                        }}
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Document</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete this document? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(doc.id)}
+                              className="bg-red-500 hover:bg-red-600"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

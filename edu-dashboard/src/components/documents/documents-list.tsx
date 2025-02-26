@@ -99,7 +99,6 @@ export function DocumentsList() {
             <TableRow>
               <TableHead>Title</TableHead>
               <TableHead>Type</TableHead>
-              <TableHead>Shared By</TableHead>
               <TableHead>Size</TableHead>
               <TableHead>Last Updated</TableHead>
               <TableHead>Actions</TableHead>
@@ -113,9 +112,6 @@ export function DocumentsList() {
                   <Badge variant={doc.type === "SHARED_ADMIN" ? "secondary" : "default"}>
                     {doc.type === "SHARED_ADMIN" ? "Admin Shared" : "Personal"}
                   </Badge>
-                </TableCell>
-                <TableCell>
-                  {doc.type === "SHARED_ADMIN" ? doc.user.name : "-"}
                 </TableCell>
                 <TableCell>{formatBytes(doc.fileSize)}</TableCell>
                 <TableCell>

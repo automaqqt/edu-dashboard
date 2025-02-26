@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import {
   Table,
@@ -18,6 +18,7 @@ import {
   FolderOpen, 
   Folder,
   Info,
+  Check
 } from "lucide-react"
 import { formatBytes } from "@/lib/utils"
 import { cn } from "@/lib/utils"
@@ -39,6 +40,7 @@ interface Document {
   skillLevel: number
   requirements?: string
   updatedAt: string
+  printed?: boolean
 }
 
 interface Folder {
@@ -68,6 +70,23 @@ function getSkillLevelColor(level: number) {
 }
 
 function DocumentsTable({ documents }: { documents: Document[] }) {
+  const [printedDocs, setPrintedDocs] = useState<Record<string, boolean>>({});
+  
+  // Load printed documents from localStorage on initial render
+  useEffect(() => {
+    const savedPrintedDocs = localStorage.getItem('printedDocuments');
+    if (savedPrintedDocs) {
+      setPrintedDocs(JSON.parse(savedPrintedDocs));
+    }
+  }, []);
+
+  // Mark a document as printed
+  const markAsPrinted = (docId: string) => {
+    const updatedPrintedDocs = { ...printedDocs, [docId]: true };
+    setPrintedDocs(updatedPrintedDocs);
+    localStorage.setItem('printedDocuments', JSON.stringify(updatedPrintedDocs));
+  };
+
   if (!documents || documents.length === 0) {
     return null;
   }
@@ -87,6 +106,7 @@ function DocumentsTable({ documents }: { documents: Document[] }) {
               <TableHead>Requirements</TableHead>
               <TableHead>Last Updated</TableHead>
               <TableHead className="w-[100px]">Print</TableHead>
+              <TableHead className="w-[80px]">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -112,7 +132,27 @@ function DocumentsTable({ documents }: { documents: Document[] }) {
                   {new Date(doc.updatedAt).toLocaleDateString()}
                 </TableCell>
                 <TableCell>
-                    <PrintButton fileUrl={doc.fileUrl}/>
+                  <PrintButton 
+                    fileUrl={doc.fileUrl} 
+                    onPrintComplete={() => markAsPrinted(doc.id)}
+                    isPrinted={printedDocs[doc.id] || false}
+                  />
+                </TableCell>
+                <TableCell>
+                  {printedDocs[doc.id] && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <div className="flex justify-center">
+                            <Check className="h-5 w-5 text-green-500" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Document has been printed</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

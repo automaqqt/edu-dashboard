@@ -2,14 +2,16 @@
 
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { Printer } from "lucide-react"
+import { Check, Printer } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
 interface PrintButtonProps {
-  fileUrl: string
+  fileUrl: string;
+  onPrintComplete?: () => void;
+  isPrinted?: boolean;
 }
 
-export function PrintButton({ fileUrl }: PrintButtonProps) {
+export function PrintButton({ fileUrl, onPrintComplete, isPrinted = false }: PrintButtonProps) {
   const { toast } = useToast()
   const [isPrinting, setIsPrinting] = useState(false)
   const iframeRef = useRef<HTMLIFrameElement>(null)
@@ -35,7 +37,23 @@ export function PrintButton({ fileUrl }: PrintButtonProps) {
       iframeRef.current.onload = () => {
         try {
           if (iframeRef.current?.contentWindow) {
-            iframeRef.current.contentWindow.print()
+            // Trigger the print
+            iframeRef.current.contentWindow.print();
+            
+            // Manually trigger the onPrintComplete callback
+            // This works around the unreliable afterprint event
+            setTimeout(() => {
+              if (onPrintComplete) {
+                onPrintComplete();
+              }
+              setIsPrinting(false);
+              
+              // Show toast notification of successful print
+              toast({
+                title: "Success",
+                description: "Document sent to printer",
+              });
+            }, 1000); // Short delay to ensure print dialog has opened
           }
         } catch (error) {
           console.error('Print failed:', error)
@@ -44,7 +62,6 @@ export function PrintButton({ fileUrl }: PrintButtonProps) {
             description: "Failed to print document",
             variant: "destructive",
           })
-        } finally {
           setIsPrinting(false)
         }
       }
@@ -66,10 +83,17 @@ export function PrintButton({ fileUrl }: PrintButtonProps) {
         variant="ghost"
         size="sm"
         onClick={handlePrint}
-        disabled={isPrinting}
+        disabled={isPrinting || isPrinted}
+        className={isPrinted ? "opacity-50 cursor-not-allowed" : ""}
       >
-        <Printer className={`h-4 w-4 ${isPrinting ? 'animate-pulse' : ''}`} />
-        <span className="sr-only">Print document</span>
+        {isPrinted ? (
+          <>
+            <Printer className="h-4 w-4" />
+          </>
+        ) : (
+          <Printer className={`h-4 w-4 ${isPrinting ? 'animate-pulse' : ''}`} />
+        )}
+        <span className="sr-only">{isPrinted ? "Already printed" : "Print document"}</span>
       </Button>
       <iframe
         ref={iframeRef}

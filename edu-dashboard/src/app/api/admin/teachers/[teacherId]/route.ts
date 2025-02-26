@@ -55,7 +55,6 @@ export async function DELETE(
     if (session?.user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 })
     }
-
     await db.user.delete({
       where: {
         id: params.teacherId
