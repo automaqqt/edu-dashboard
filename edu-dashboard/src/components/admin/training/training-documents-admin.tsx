@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   Table,
@@ -22,7 +22,11 @@ import {
   ArrowUpDown,
   Move,
   GripVertical,
-  FolderInput
+  FolderInput,
+  Edit,
+  MoreHorizontal,
+  ArrowUp,
+  ArrowDown
 } from "lucide-react"
 import { formatBytes } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
@@ -56,6 +60,7 @@ import { UploadTrainingButton } from "./upload-training-button"
 import { AddFolderButton } from "./add-folder-button"
 import { MoveFolderDialog } from "./move-folder-dialog"
 import { MoveDocumentDialog } from "./move-document-dialog"
+import { EditFolderDialog } from "./edit-folder-dialog"
 
 // Import react-beautiful-dnd for drag-and-drop functionality
 import { 
@@ -76,7 +81,7 @@ interface Document {
   skillLevel: number
   requirements?: string
   updatedAt: string
-  order?: number
+  ord?: number
   folderId: string
 }
 
@@ -87,25 +92,26 @@ interface Folder {
   documents: Document[]
   subFolders: Folder[]
   parentId: string | null
-  order?: number
+  ord?: number
+}
+
+// Recursive function to flatten the folder hierarchy
+function getAllFoldersFlattened(folders: Folder[]): Folder[] {
+  let allFolders: Folder[] = [];
+  
+  function traverse(folder: Folder) {
+    allFolders.push(folder);
+    if (folder.subFolders && folder.subFolders.length > 0) {
+      folder.subFolders.forEach(subFolder => traverse(subFolder));
+    }
+  }
+  
+  folders.forEach(folder => traverse(folder));
+  return allFolders;
 }
 
 type SortField = "title" | "skillLevel" | "fileSize" | "updatedAt"
 type SortDirection = "asc" | "desc"
-
-function getAllFoldersFlattened(folders: Folder[]): Folder[] {
-    let allFolders: Folder[] = [];
-    
-    function traverse(folder: Folder) {
-      allFolders.push(folder);
-      if (folder.subFolders && folder.subFolders.length > 0) {
-        folder.subFolders.forEach(subFolder => traverse(subFolder));
-      }
-    }
-    
-    folders.forEach(folder => traverse(folder));
-    return allFolders;
-  }
 
 function DocumentsTable({ 
   documents, 
@@ -123,28 +129,68 @@ function DocumentsTable({
   const [sortField, setSortField] = useState<SortField>("updatedAt")
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc")
 
+  // Move document up using API
+  const moveDocumentUpMutation = useMutation({
+    mutationFn: async (documentId: string) => {
+      const response = await fetch("/api/admin/training/reorder-single", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          documentId,
+          direction: "up"
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to move document up");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["training-folders"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to move document up",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Move document down using API
+  const moveDocumentDownMutation = useMutation({
+    mutationFn: async (documentId: string) => {
+      const response = await fetch("/api/admin/training/reorder-single", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          documentId,
+          direction: "down"
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to move document down");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["training-folders"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to move document down",
+        variant: "destructive",
+      });
+    }
+  });
+
   if (!documents || documents.length === 0) {
     return null;
   }
 
   // Sort documents based on current sort criteria
-  const sortedDocuments = [...documents].sort((a, b) => {
-    const directionModifier = sortDirection === "asc" ? 1 : -1;
-    
-    if (sortField === "title") {
-      return a.title.localeCompare(b.title) * directionModifier;
-    } 
-    else if (sortField === "skillLevel") {
-      return (a.skillLevel - b.skillLevel) * directionModifier;
-    }
-    else if (sortField === "fileSize") {
-      return (a.fileSize - b.fileSize) * directionModifier;
-    }
-    else {
-      // updatedAt
-      return (new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()) * directionModifier;
-    }
-  });
+  const sortedDocuments = [...documents]
 
   // Toggle sort direction or change sort field
   const toggleSort = (field: SortField) => {
@@ -164,19 +210,14 @@ function DocumentsTable({
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
     
-    // Update the order property of each item
-    const itemsWithOrder = items.map((item, index) => ({
-      ...item,
-      order: index
-    }));
     
-    onReorder(itemsWithOrder);
+    onReorder(items);
   };
 
   // Delete document mutation
   const deleteMutation = useMutation({
     mutationFn: async (docId: string) => {
-      const response = await fetch(`/api/admin/documents/${docId}`, {
+      const response = await fetch(`/api/admin/training/${docId}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete document");
@@ -198,27 +239,6 @@ function DocumentsTable({
     }
   });
 
-  const handleDelete = async (documentId: string) => {
-    try {
-      const response = await fetch(`/api/documents/${documentId}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) throw new Error("Failed to delete document")
-
-      toast({
-        title: "Success",
-        description: "Document deleted successfully",
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete document",
-        variant: "destructive",
-      })
-    }
-  }
-
   return (
     <Card>
       <CardContent className="p-0">
@@ -227,43 +247,15 @@ function DocumentsTable({
             <TableHeader>
               <TableRow>
                 <TableHead className="w-8"></TableHead> {/* Handle column */}
-                <TableHead>
-                  <Button variant="ghost" onClick={() => toggleSort("title")} className="p-0 h-8">
-                    Title
-                    <ArrowUpDown className={cn(
-                      "ml-1 h-4 w-4",
-                      sortField === "title" ? "text-primary" : "text-muted-foreground"
-                    )} />
-                  </Button>
+                <TableHead>Titel</TableHead>
+        
+                <TableHead>Skill
                 </TableHead>
                 <TableHead>
-                  <Button variant="ghost" onClick={() => toggleSort("skillLevel")} className="p-0 h-8">
-                    Skill Level
-                    <ArrowUpDown className={cn(
-                      "ml-1 h-4 w-4",
-                      sortField === "skillLevel" ? "text-primary" : "text-muted-foreground"
-                    )} />
-                  </Button>
+                  Vorraussetzungen
                 </TableHead>
-                <TableHead>
-                  <Button variant="ghost" onClick={() => toggleSort("fileSize")} className="p-0 h-8">
-                    Vorraussetzungen
-                    <ArrowUpDown className={cn(
-                      "ml-1 h-4 w-4",
-                      sortField === "fileSize" ? "text-primary" : "text-muted-foreground"
-                    )} />
-                  </Button>
-                </TableHead>
-                <TableHead>
-                  <Button variant="ghost" onClick={() => toggleSort("updatedAt")} className="p-0 h-8">
-                    Last Updated
-                    <ArrowUpDown className={cn(
-                      "ml-1 h-4 w-4",
-                      sortField === "updatedAt" ? "text-primary" : "text-muted-foreground"
-                    )} />
-                  </Button>
-                </TableHead>
-                <TableHead>Actions</TableHead>
+                
+                <TableHead className="text-right pr-40">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <Droppable droppableId={`documents-${folderId}`}>
@@ -290,7 +282,6 @@ function DocumentsTable({
                           </TableCell>
                           <TableCell className="font-medium">
                             {doc.title}
-                            
                           </TableCell>
                           <TableCell>
                             <Badge className={cn(
@@ -303,11 +294,36 @@ function DocumentsTable({
                             </Badge>
                           </TableCell>
                           <TableCell><p className="max-w-xs whitespace-normal">{doc.requirements}</p></TableCell>
-                          <TableCell>
-                            {new Date(doc.updatedAt).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
+                          <TableCell className="float-right pr-5">
+                            <div className="flex items-center gap-2 ">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                disabled={index === 0}
+                                onClick={() => moveDocumentUpMutation.mutate(doc.id)}
+                                className={index === 0 || moveDocumentUpMutation.isPending ? "opacity-50" : ""}
+                              >
+                                <ArrowUp className="h-4 w-4 text-blue-500" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                disabled={index === sortedDocuments.length - 1}
+                                onClick={() => moveDocumentDownMutation.mutate(doc.id)}
+                                className={index === sortedDocuments.length - 1 || moveDocumentDownMutation.isPending ? "opacity-50" : ""}
+                              >
+                                <ArrowDown className="h-4 w-4 text-blue-500" />
+                              </Button>
+                              <MoveDocumentDialog
+                                document={doc}
+                                allFolders={allFolders}
+                                currentFolderId={folderId}
+                                trigger={
+                                  <Button variant="ghost" size="sm">
+                                    <FolderInput className="h-4 w-4 text-blue-500" />
+                                  </Button>
+                                }
+                              />
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -322,16 +338,6 @@ function DocumentsTable({
                               >
                                 <Download className="h-4 w-4" />
                               </Button>
-                              <MoveDocumentDialog
-                                document={doc}
-                                allFolders={allFolders}
-                                currentFolderId={folderId}
-                                trigger={
-                                  <Button variant="ghost" size="sm">
-                                    <FolderInput className="h-4 w-4 text-blue-500" />
-                                  </Button>
-                                }
-                              />
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                   <Button variant="ghost" size="sm">
@@ -348,7 +354,7 @@ function DocumentsTable({
                                   <AlertDialogFooter>
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                     <AlertDialogAction
-                                      onClick={() => handleDelete(doc.id)}
+                                      onClick={() => deleteMutation.mutate(doc.id)}
                                       className="bg-red-500 hover:bg-red-600"
                                     >
                                       Delete
@@ -385,11 +391,94 @@ function FolderTree({
   onDocumentReorder: (folderId: string, items: Document[]) => void
 }) {
   const [isOpen, setIsOpen] = useState(false)
+  const { toast } = useToast()
+  const queryClient = useQueryClient()
   const hasContents = (folder.documents?.length ?? 0) > 0 || (folder.subFolders?.length ?? 0) > 0
   
-  // Sort subfolders by their order property
+  // Delete folder mutation
+  const deleteFolderMutation = useMutation({
+    mutationFn: async (folderId: string) => {
+      const response = await fetch(`/api/admin/folders/${folderId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Failed to delete folder");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["training-folders"] });
+      toast({
+        title: "Success",
+        description: "Folder deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete folder",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Move folder up using API
+  const moveFolderUpMutation = useMutation({
+    mutationFn: async (folderId: string) => {
+      const response = await fetch("/api/admin/folders/reorder-single", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          folderId,
+          direction: "up"
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to move folder up");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["training-folders"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to move folder up",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Move folder down using API
+  const moveFolderDownMutation = useMutation({
+    mutationFn: async (folderId: string) => {
+      const response = await fetch("/api/admin/folders/reorder-single", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          folderId,
+          direction: "down"
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to move folder down");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["training-folders"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to move folder down",
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Sort subfolders by their ord property
   const sortedSubFolders = [...(folder.subFolders || [])].sort((a, b) => 
-    (a.order || 0) - (b.order || 0)
+    (a.ord || 0) - (b.ord || 0)
   );
 
   // Handle drag end for subfolders
@@ -400,10 +489,10 @@ function FolderTree({
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
     
-    // Update the order property of each item
+    // Update the ord property of each item
     const itemsWithOrder = items.map((item, index) => ({
       ...item,
-      order: index
+      ord: index
     }));
     
     onFolderReorder(folder.id, itemsWithOrder);
@@ -416,10 +505,10 @@ function FolderTree({
 
   return (
     <div className="space-y-2 border border-border rounded-md p-2 bg-card">
-      <div className="flex items-center">
+      <div className="flex items-center justify-between">
         <Button
           variant="ghost"
-          className="justify-start hover:bg-accent w-full"
+          className="justify-start hover:bg-accent flex-1 text-left"
           onClick={() => setIsOpen(!isOpen)}
         >
           {hasContents ? (
@@ -450,24 +539,99 @@ function FolderTree({
             </TooltipProvider>
           )}
         </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <Move className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <MoveFolderDialog
-              folder={folder}
-              allFolders={allFolders}
-              trigger={
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  Move to Different Folder
-                </DropdownMenuItem>
-              }
-            />
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center">
+          <EditFolderDialog
+            folder={folder}
+            trigger={
+              <Button variant="ghost" size="sm">
+                <Edit className="h-4 w-4 text-muted-foreground" />
+              </Button>
+            }
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem 
+                onClick={() => moveFolderUpMutation.mutate(folder.id)}
+                disabled={
+                  folder.parentId
+                    ? allFolders.filter(f => f.parentId === folder.parentId)[0]?.id === folder.id
+                    : allFolders.filter(f => !f.parentId)[0]?.id === folder.id
+                }
+                className={
+                  moveFolderUpMutation.isPending ||
+                  (folder.parentId
+                    ? allFolders.filter(f => f.parentId === folder.parentId)[0]?.id === folder.id
+                    : allFolders.filter(f => !f.parentId)[0]?.id === folder.id)
+                  ? "opacity-50" : ""
+                }
+              >
+                <ArrowUp className="mr-2 h-4 w-4" />
+                Move Up
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => moveFolderDownMutation.mutate(folder.id)}
+                disabled={
+                  folder.parentId
+                    ? allFolders.filter(f => f.parentId === folder.parentId).pop()?.id === folder.id
+                    : allFolders.filter(f => !f.parentId).pop()?.id === folder.id
+                }
+                className={
+                  moveFolderDownMutation.isPending ||
+                  (folder.parentId
+                    ? allFolders.filter(f => f.parentId === folder.parentId).pop()?.id === folder.id
+                    : allFolders.filter(f => !f.parentId).pop()?.id === folder.id)
+                  ? "opacity-50" : ""
+                }
+              >
+                <ArrowDown className="mr-2 h-4 w-4" />
+                Move Down
+              </DropdownMenuItem>
+              <MoveFolderDialog
+                folder={folder}
+                allFolders={allFolders}
+                trigger={
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <Move className="mr-2 h-4 w-4" />
+                    Move to Different Folder
+                  </DropdownMenuItem>
+                }
+              />
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem 
+                    className="text-red-500"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Folder
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Folder</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete this folder? This will also delete all documents and subfolders inside it. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => deleteFolderMutation.mutate(folder.id)}
+                      className="bg-red-500 hover:bg-red-600"
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {isOpen && (
@@ -527,6 +691,7 @@ function FolderTree({
 export function TrainingDocumentsAdmin() {
   const { toast } = useToast()
   const queryClient = useQueryClient()
+  
   const { data: folders, isLoading } = useQuery<Folder[]>({
     queryKey: ["training-folders"],
     queryFn: async () => {
@@ -536,7 +701,7 @@ export function TrainingDocumentsAdmin() {
     }
   })
 
-  // Update folder order mutation
+  // Update folder ord mutation
   const updateFolderOrderMutation = useMutation({
     mutationFn: async ({ parentId, items }: { parentId: string, items: Folder[] }) => {
       const response = await fetch("/api/admin/folders/reorder", {
@@ -568,7 +733,7 @@ export function TrainingDocumentsAdmin() {
     }
   });
 
-  // Update document order mutation
+  // Update document ord mutation
   const updateDocumentOrderMutation = useMutation({
     mutationFn: async ({ folderId, items }: { folderId: string, items: Document[] }) => {
       const response = await fetch("/api/admin/training/reorder", {
@@ -618,10 +783,10 @@ export function TrainingDocumentsAdmin() {
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
     
-    // Update the order property of each item
+    // Update the ord property of each item
     const itemsWithOrder = items.map((item, index) => ({
       ...item,
-      order: index
+      ord: index
     }));
     
     updateFolderOrderMutation.mutate({ parentId: "root", items: itemsWithOrder });
@@ -631,9 +796,9 @@ export function TrainingDocumentsAdmin() {
     return <div>Loading...</div>
   }
 
-  // Sort folders by their order property
+  // Sort folders by their ord property
   const sortedFolders = [...(folders || [])].sort((a, b) => 
-    (a.order || 0) - (b.order || 0)
+    (a.ord || 0) - (b.ord || 0)
   );
 
   return (

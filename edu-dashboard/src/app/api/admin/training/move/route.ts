@@ -40,11 +40,12 @@ export async function POST(req: Request) {
     }
 
     // Get the maximum order value in the target folder
-    const maxOrderResult = await db.document.findMany({
+    const maxOrderResult = await db.document.aggregate({
       where: { folderId: targetFolderId },
+      _max: { ord: true }
     });
 
-    const newOrder = (maxOrderResult.length ?? -1) + 1;
+    const newOrder = (maxOrderResult._max.ord ?? -1) + 1;
 
     // Move the document to the target folder
     await db.document.update({
@@ -52,7 +53,8 @@ export async function POST(req: Request) {
       data: { 
         folder: {
           connect: { id: targetFolderId }
-        }
+        },
+        ord: newOrder
       },
     });
 

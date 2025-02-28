@@ -19,21 +19,21 @@ export async function GET(req: Request) {
         include: {
           documents: {
             orderBy: {
-              updatedAt: 'desc'
+              ord: 'asc'
             }
           },
           subFolders: {
             include: {
               documents: {
                 orderBy: {
-                  updatedAt: 'desc'
+                  ord: 'asc'
                 }
               },
               subFolders: {
                 include: {
                   documents: {
                     orderBy: {
-                      updatedAt: 'desc'
+                      ord: 'asc'
                     }
                   },
                   subFolders: {
@@ -48,7 +48,7 @@ export async function GET(req: Request) {
           }
         },
         orderBy: {
-          name: 'asc'
+          ord: 'asc'
         }
       })
   

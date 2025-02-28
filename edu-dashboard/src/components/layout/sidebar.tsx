@@ -108,11 +108,12 @@ export function Sidebar() {
   const routes = isAdmin ? adminRoutes : teacherRoutes
 
   return (
-    <div className="space-y-4 py-4 flex flex-col h-full bg-violet-950 text-white">
-      <div className="px-3 py-2 flex-1">
-        <Link href="/dashboard" className="flex items-center justify-center mb-14">
+    <div className="flex flex-col h-full">
+      {/* White header section with logo */}
+      <div className="bg-gray-100 py-6 flex justify-center items-center border-b border-violet-200">
+        <Link href="/dashboard">
           {/* Replace with your actual logo */}
-          <div className="relative w-60 h-20">
+          <div className="relative w-40 h-20">
             <Image 
               src="/logo.webp" 
               alt="EduDashboard Logo"
@@ -122,14 +123,18 @@ export function Sidebar() {
             />
           </div>
         </Link>
-        <div className="space-y-1">
+      </div>
+      
+      {/* Violet sidebar content */}
+      <div className="flex-1 bg-violet-900 py-4">
+        <div className="px-3 py-2 space-y-1">
           {routes.map((route) => (
             <Link
               key={route.href}
               href={route.href}
               className={cn(
-                "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-violet-800/50 rounded-lg transition",
-                pathname === route.href ? "text-white bg-violet-800/50" : "text-violet-200"
+                "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-violet-800 rounded-lg transition",
+                pathname === route.href ? "text-white bg-violet-800" : "text-violet-100"
               )}
             >
               <div className="flex items-center flex-1">

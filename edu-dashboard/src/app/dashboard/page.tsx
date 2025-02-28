@@ -59,6 +59,7 @@ async function getAdminStats() {
         email: true,
         gruppenanzahl: true,
         teilnehmeranzahl: true,
+        lastLoginAt: true
       }
     })
   

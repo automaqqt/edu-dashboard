@@ -31,14 +31,16 @@ export async function POST(req: Request) {
       return new NextResponse("Folder not found", { status: 404 });
     }
 
-    // Execute a transaction to update all documents in the correct order
+    // Execute a transaction to update all documents in the correct ord
     await db.$transaction(
       documentIds.map((documentId, index) => 
         db.document.update({
           where: { id: documentId },
           data: { 
-            order: index,
-            folderId: folderId, // Ensure the document is in the correct folder
+            ord: index,
+            folder: {
+              connect: { id: folderId } // Ensure the document is in the correct folder
+            }
           },
         })
       )

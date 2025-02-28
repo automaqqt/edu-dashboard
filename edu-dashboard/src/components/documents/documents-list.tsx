@@ -133,32 +133,7 @@ export function DocumentsList() {
                     >
                       <Download className="h-4 w-4" />
                     </Button>
-                    {doc.type !== "SHARED_ADMIN" && (
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <Trash2 className="h-4 w-4 text-red-500" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Document</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete this document? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDelete(doc.id)}
-                              className="bg-red-500 hover:bg-red-600"
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    )}
+                    
                   </div>
                 </TableCell>
               </TableRow>

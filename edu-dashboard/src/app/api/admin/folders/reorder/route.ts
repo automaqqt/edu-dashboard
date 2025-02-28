@@ -25,15 +25,19 @@ export async function POST(req: Request) {
     // Check if we're reordering root folders (parentId === "root")
     const parentIdForDB = parentId === "root" ? null : parentId;
 
-    // Execute a transaction to update all folders in the correct order
+    // Execute a transaction to update all folders in the correct ord
     await db.$transaction(
       folderIds.map((folderId, index) => 
         db.folder.update({
           where: { id: folderId },
           data: { 
-            order: index,
-            // If we're reordering root folders or moving folders to a new parent
-            ...(parentIdForDB !== undefined && { parentId: parentIdForDB }),
+            ord: index,
+            // If we're moving folders to a new parent
+            ...(parentIdForDB !== undefined && { 
+              parent: parentIdForDB === null 
+                ? { disconnect: true }
+                : { connect: { id: parentIdForDB } }
+            }),
           },
         })
       )

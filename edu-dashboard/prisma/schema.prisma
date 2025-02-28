@@ -1,7 +1,7 @@
 // File: prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
-  output = "../../node_modules/.prisma/client"
+  output = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -41,7 +41,7 @@ model Folder {
   description String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  order       Int        @default(0)  
+  ord       Int        @default(0)  
   parentId    String?    // For nested folders
   parent      Folder?    @relation("FolderToFolder", fields: [parentId], references: [id])
   subFolders  Folder[]   @relation("FolderToFolder")
@@ -58,7 +58,7 @@ model Document {
   type          String   // "TRAINING" or "PERSONAL"
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  order         Int      @default(0)  
+  ord         Int      @default(0)  
   userId        String?
   user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   // New fields

@@ -91,9 +91,7 @@ function DocumentsTable({ documents }: { documents: Document[] }) {
     return null;
   }
 
-  const sortedDocuments = [...documents].sort((a, b) => 
-    new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  );
+  const sortedDocuments = [...documents];
 
   return (
     <Card>
@@ -104,7 +102,6 @@ function DocumentsTable({ documents }: { documents: Document[] }) {
               <TableHead>Title</TableHead>
               <TableHead>Skill Level</TableHead>
               <TableHead>Requirements</TableHead>
-              <TableHead>Last Updated</TableHead>
               <TableHead className="w-[100px]">Print</TableHead>
               <TableHead className="w-[80px]">Status</TableHead>
             </TableRow>
@@ -127,9 +124,6 @@ function DocumentsTable({ documents }: { documents: Document[] }) {
                 </TableCell>
                 <TableCell>
                 <p className="max-w-xs whitespace-normal">{doc.requirements}</p>
-                </TableCell>
-                <TableCell>
-                  {new Date(doc.updatedAt).toLocaleDateString()}
                 </TableCell>
                 <TableCell>
                   <PrintButton 
@@ -224,7 +218,7 @@ export function TrainingDocuments() {
   const { data: folders, isLoading } = useQuery<Folder[]>({
     queryKey: ["training-folders"],
     queryFn: async () => {
-      const response = await fetch("/api/training/folders")
+      const response = await fetch("/api/folders")
       if (!response.ok) throw new Error("Failed to fetch training documents")
       return response.json()
     }
