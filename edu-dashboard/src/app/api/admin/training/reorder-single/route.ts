@@ -33,12 +33,15 @@ export async function POST(req: Request) {
     if (!document) {
       return new NextResponse("Document not found", { status: 404 });
     }
-
+    if (!document.folder) {
+        return new NextResponse("Document has no folder attafched", { status: 404 });
+      }
+    const folderId = document.folder.id;
     // Get all documents in the same folder, sorted by ord
     const documentsInFolder = await db.document.findMany({
       where: {
         folder: {
-          id: document.folder.id
+          id: folderId
         }
       },
       orderBy: {
@@ -46,11 +49,9 @@ export async function POST(req: Request) {
       }
     });
     // Find the current document index
-    const currentIndex = documentsInFolder.findIndex((doc: { id: string; }) => doc.id === documentId);
-    console.log(documentsInFolder)
     if (document.ord === 0) {
         const maxOrderResult = await db.document.aggregate({
-            where: { folderId: document.folder.id },
+            where: { folderId: folderId },
             _max: { ord: true }
           });
       

@@ -71,9 +71,9 @@ export function LoginForm() {
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-6 text-black">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 text-black">
           <FormField
             control={form.control}
             name="email"
@@ -100,10 +100,12 @@ export function LoginForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>Passwort</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter your password"
+
+                    className="text-black"
+                    placeholder="Gib dein Password ein"
                     type="password"
                     autoComplete="current-password"
                     disabled={isLoading}
@@ -119,13 +121,13 @@ export function LoginForm() {
               {isLoading && (
                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Sign In
+              Anmelden
             </Button>
             <Link
               href="/reset-password"
-              className="text-sm text-muted-foreground hover:text-primary text-center"
+              className="text-sm text-black hover:text-primary text-center"
             >
-              Forgot your password?
+              Passwort vergessen?
             </Link>
           </div>
         </form>
