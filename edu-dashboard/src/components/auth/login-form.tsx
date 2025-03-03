@@ -82,7 +82,6 @@ export function LoginForm() {
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="name@example.com"
                     type="email"
                     autoCapitalize="none"
                     autoComplete="email"
@@ -105,7 +104,6 @@ export function LoginForm() {
                   <Input
 
                     className="text-black"
-                    placeholder="Gib dein Passwort ein"
                     type="password"
                     autoComplete="current-password"
                     disabled={isLoading}
