@@ -18,7 +18,7 @@ export function MobileSidebar() {
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="md:hidden">
           <Menu className="h-6 w-6" />
-          <span className="sr-only">Open sidebar</span>
+          <span className="sr-only">Menü öffnen</span>
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="p-0">

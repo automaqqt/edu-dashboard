@@ -61,11 +61,11 @@ export default function SettingsPage() {
 
   return (
     <div className="container max-w-md py-10">
-      <h1 className="text-2xl font-bold mb-6">Settings</h1>
+      <h1 className="text-2xl font-bold mb-6">Einstellungen</h1>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="gruppenanzahl">Number of Groups</Label>
+          <Label htmlFor="gruppenanzahl">Gruppenanzahl</Label>
           <Input
             id="gruppenanzahl"
             type="number"
@@ -78,7 +78,7 @@ export default function SettingsPage() {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="teilnehmeranzahl">Number of Participants</Label>
+          <Label htmlFor="teilnehmeranzahl">Anzahl der Teilnehmer</Label>
           <Input
             id="teilnehmeranzahl"
             type="number"
@@ -96,9 +96,9 @@ export default function SettingsPage() {
             variant="outline"
             onClick={() => router.push("/dashboard")}
           >
-            Cancel
+            Abbrechen
           </Button>
-          <Button type="submit">Save Changes</Button>
+          <Button type="submit">Speichern</Button>
         </div>
       </form>
     </div>

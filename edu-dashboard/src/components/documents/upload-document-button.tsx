@@ -74,11 +74,11 @@ export function UploadDocumentButton() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Upload Document</Button>
+        <Button>Dokument hochladen</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Upload Document</DialogTitle>
+          <DialogTitle>Dokument hochladen</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -87,7 +87,7 @@ export function UploadDocumentButton() {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -100,7 +100,7 @@ export function UploadDocumentButton() {
               name="fileUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>File</FormLabel>
+                  <FormLabel>Datei</FormLabel>
                   <FormControl>
                     <FileUpload
                       endpoint="documents"
@@ -112,7 +112,7 @@ export function UploadDocumentButton() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Upload</Button>
+            <Button type="submit">Hochladen</Button>
           </form>
         </Form>
       </DialogContent>

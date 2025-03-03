@@ -116,7 +116,7 @@ export function Sidebar() {
           <div className="relative w-40 h-20">
             <Image 
               src="/logo.webp" 
-              alt="EduDashboard Logo"
+              alt="mitteinandermatt Logo"
               fill
               className="object-contain"
               priority

@@ -51,7 +51,7 @@ export function LoginForm() {
       if (result?.error) {
         toast({
           title: "Error",
-          description: "Invalid email or password",
+          description: "Falsche Email oder Passwort",
           variant: "destructive",
         })
         return
@@ -105,7 +105,7 @@ export function LoginForm() {
                   <Input
 
                     className="text-black"
-                    placeholder="Gib dein Password ein"
+                    placeholder="Gib dein Passwort ein"
                     type="password"
                     autoComplete="current-password"
                     disabled={isLoading}

@@ -11,8 +11,8 @@ import "./globals.css" // Make sure this is imported
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "EduDashboard",
-  description: "A comprehensive platform for managing educational resources",
+  title: "MitteinanderMatt Dashboard",
+  description: "Für die Lehrer und so",
 }
 
 export default function RootLayout({

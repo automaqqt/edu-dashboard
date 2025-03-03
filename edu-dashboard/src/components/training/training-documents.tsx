@@ -99,10 +99,10 @@ function DocumentsTable({ documents }: { documents: Document[] }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Skill Level</TableHead>
-              <TableHead>Requirements</TableHead>
-              <TableHead className="w-[100px]">Print</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Schwierigkeit</TableHead>
+              <TableHead>Vorraussetungen</TableHead>
+              <TableHead className="w-[100px]">Druckent</TableHead>
               <TableHead className="w-[80px]">Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -142,7 +142,7 @@ function DocumentsTable({ documents }: { documents: Document[] }) {
                           </div>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Document has been printed</p>
+                          <p>Dokument wurde gedruckt</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -227,7 +227,7 @@ export function TrainingDocuments() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-32">
-        <p className="text-muted-foreground">Loading training materials...</p>
+        <p className="text-muted-foreground">Lade Trainingsmaterial...</p>
       </div>
     )
   }
@@ -235,7 +235,7 @@ export function TrainingDocuments() {
   if (!folders || folders.length === 0) {
     return (
       <div className="flex items-center justify-center h-32">
-        <p className="text-muted-foreground">No training materials available.</p>
+        <p className="text-muted-foreground">Kein Trainingsmaterial vorhanden.</p>
       </div>
     )
   }

@@ -66,7 +66,7 @@ export function ChatWindow() {
   return (
     <Card className="h-[600px] flex flex-col">
       <CardHeader>
-        <CardTitle>Support Chat</CardTitle>
+        <CardTitle>Betreuer Chat</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col p-0 min-h-0">
         <div className="flex-1 overflow-hidden pr-4 pl-6 pt-2">
@@ -107,7 +107,7 @@ export function ChatWindow() {
               className="resize-none"
             />
             <Button type="submit" disabled={!message.trim()}>
-              Send
+              Senden
             </Button>
           </div>
         </form>

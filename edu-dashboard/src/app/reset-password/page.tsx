@@ -71,9 +71,9 @@ export default function ResetPasswordPage() {
                 <MailCheck className="h-8 w-8 text-green-600" />
               </div>
             </div>
-            <CardTitle className="text-center">Check your email</CardTitle>
+            <CardTitle className="text-center">Schau in deine Mails</CardTitle>
             <CardDescription className="text-center">
-              We have sent you a password reset link to your email address.
+              Wir haben dir einen Link für ein neues Passwort per Mail zugesandt.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -85,9 +85,9 @@ export default function ResetPasswordPage() {
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
       <Card className="w-[400px]">
         <CardHeader>
-          <CardTitle>Reset Password</CardTitle>
+          <CardTitle>Passwort zurücksetzen</CardTitle>
           <CardDescription>
-            Enter your email address and we will send you a link to reset your password.
+            Gib deine Email Adresse an und wir werden dir einen Link zum Passwort zurücksetzen senden.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -107,7 +107,7 @@ export default function ResetPasswordPage() {
                 )}
               />
               <Button type="submit" className="w-full">
-                Send Reset Link
+                Senden
               </Button>
             </form>
           </Form>

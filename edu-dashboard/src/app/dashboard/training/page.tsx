@@ -11,7 +11,7 @@ export default async function TrainingPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Trainingskonzept</h1>
         <p className="text-muted-foreground">
-          Manage and access training documents
+          Zugang zu den Trainingsunterlagen
         </p>
       </div>
       <TrainingDocuments />

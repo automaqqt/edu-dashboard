@@ -11,9 +11,9 @@ export default async function DocumentsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Documents</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Dokumente</h1>
           <p className="text-muted-foreground">
-            Manage your documents and view shared admin documents
+            Verwalte deine Dokumente
           </p>
         </div>
         <UploadDocumentButton />

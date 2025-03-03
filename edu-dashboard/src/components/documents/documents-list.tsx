@@ -14,18 +14,6 @@ import { Download, Trash2, Search } from "lucide-react"
 import { formatBytes } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
-import { useToast } from "@/components/ui/use-toast"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 
 interface Document {
@@ -43,7 +31,6 @@ interface Document {
 }
 
 export function DocumentsList() {
-  const { toast } = useToast()
   const [search, setSearch] = useState("")
 
   const { data: documents, refetch } = useQuery<Document[]>({
@@ -54,28 +41,6 @@ export function DocumentsList() {
       return response.json()
     }
   })
-
-  const handleDelete = async (documentId: string) => {
-    try {
-      const response = await fetch(`/api/documents/${documentId}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) throw new Error("Failed to delete document")
-
-      toast({
-        title: "Success",
-        description: "Document deleted successfully",
-      })
-      refetch()
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete document",
-        variant: "destructive",
-      })
-    }
-  }
 
   const filteredDocuments = documents?.filter(doc =>
     doc.title.toLowerCase().includes(search.toLowerCase())
@@ -97,11 +62,11 @@ export function DocumentsList() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Size</TableHead>
-              <TableHead>Last Updated</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Typ</TableHead>
+              <TableHead>Größe</TableHead>
+              <TableHead>Zuletzt geändert</TableHead>
+              <TableHead>Aktionen</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

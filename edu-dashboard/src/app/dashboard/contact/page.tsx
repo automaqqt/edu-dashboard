@@ -26,7 +26,7 @@ export default function ContactPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Kontakt</h1>
         <p className="text-muted-foreground">
-          Contact information and support chat
+          Kontaktinformationen und live chat
         </p>
       </div>
       <div className="grid gap-6 md:grid-cols-2">

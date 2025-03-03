@@ -10,20 +10,20 @@ import {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Contact Information</CardTitle>
+          <CardTitle>Kontakt Informationen</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center space-x-3">
             <Mail className="h-5 w-5 text-muted-foreground" />
-            <span>support@example.com</span>
+            <span>miteinandermatt@schachzwerge-magdeburg.de</span>
           </div>
           <div className="flex items-center space-x-3">
             <Phone className="h-5 w-5 text-muted-foreground" />
-            <span>+1 (555) 123-4567</span>
+            <span>0176 84557522</span>
           </div>
           <div className="flex items-center space-x-3">
             <Clock className="h-5 w-5 text-muted-foreground" />
-            <span>Mon-Fri: 9:00 - 17:00</span>
+            <span>Vilen Rafayevych</span>
           </div>
         </CardContent>
       </Card>

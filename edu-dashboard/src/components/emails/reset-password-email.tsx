@@ -17,7 +17,7 @@ import {
     return (
       <Html>
         <Head />
-        <Preview>Reset your password for EduDashboard</Preview>
+        <Preview>Reset your password for MiteinanderMatt</Preview>
         <Body style={main}>
           <Container style={container}>
             <Heading style={h1}>Reset Password</Heading>

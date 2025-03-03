@@ -50,7 +50,7 @@ export function AnnouncementsList() {
                 onClick={() => handlePrint(announcement.fileUrl)}
               >
                 <Printer className="h-4 w-4 mr-2" />
-                Print
+                Drucken
               </Button>
             )}
           </CardHeader>
