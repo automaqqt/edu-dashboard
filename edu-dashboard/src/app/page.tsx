@@ -12,7 +12,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500">
+    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 via-purple-500 to-fuchsia-500">
       <div className="container flex flex-col items-center justify-center gap-8 px-4 py-10 md:px-6 md:py-12 lg:py-16">
         {/* Logo at the top */}
         <div className="mb-2">

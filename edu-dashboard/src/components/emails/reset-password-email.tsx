@@ -17,18 +17,18 @@ import {
     return (
       <Html>
         <Head />
-        <Preview>Reset your password for MiteinanderMatt</Preview>
+        <Preview>Setzte dein Passwort für MiteinanderMatt zurück</Preview>
         <Body style={main}>
           <Container style={container}>
-            <Heading style={h1}>Reset Password</Heading>
+            <Heading style={h1}>Passwort ändern</Heading>
             <Text style={text}>
-              Click the button below to reset your password. This link will expire in 1 hour.
+              Mit dem folgenden Link kannst du dein Passwort zurücksetzen, klicke einfach auf den Button.
             </Text>
             <Link href={resetUrl} style={button}>
-              Reset Password
+              Passwort zurücksetzen
             </Link>
             <Text style={text}>
-              If you did not request this email you can safely ignore it.
+              Wenn du dein Passwort nicht zurücksetzen möchtest kannst du diese EMail ignorieren.
             </Text>
           </Container>
         </Body>

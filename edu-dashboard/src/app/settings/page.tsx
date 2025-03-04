@@ -71,7 +71,7 @@ export default function SettingsPage() {
             type="number"
             min={0}
             max={100}
-            placeholder="Enter number of groups"
+            placeholder="Gib die Anzahl deiner Gruppen an"
             value={gruppenanzahl}
             onChange={(e) => setGruppenanzahl(e.target.value)}
           />
@@ -84,7 +84,7 @@ export default function SettingsPage() {
             type="number"
             min={0}
             max={1000}
-            placeholder="Enter number of participants"
+            placeholder="Gib die Anzahl deiner Teilnehmer an"
             value={teilnehmeranzahl}
             onChange={(e) => setTeilnehmeranzahl(e.target.value)}
           />

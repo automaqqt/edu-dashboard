@@ -88,9 +88,9 @@ export default function ResetPasswordTokenPage({
                 <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
             </div>
-            <CardTitle className="text-center">Password Reset Complete</CardTitle>
+            <CardTitle className="text-center">Passwort erfolgreich zurückgesetzt</CardTitle>
             <CardDescription className="text-center">
-              Your password has been successfully reset. Redirecting to login...
+              Dein Password wurde erfolgreich geändert. Weiterleitung zum Login..
             </CardDescription>
           </CardHeader>
         </Card>
@@ -102,9 +102,9 @@ export default function ResetPasswordTokenPage({
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
       <Card className="w-[400px]">
         <CardHeader>
-          <CardTitle>Set New Password</CardTitle>
+          <CardTitle>Neues Passwort vergeben</CardTitle>
           <CardDescription>
-            Please enter your new password below.
+            Bitte gib hier dein neues Passwort ein.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -115,7 +115,7 @@ export default function ResetPasswordTokenPage({
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>New Password</FormLabel>
+                    <FormLabel>Neues Passwort</FormLabel>
                     <FormControl>
                       <Input {...field} type="password" />
                     </FormControl>
@@ -128,7 +128,7 @@ export default function ResetPasswordTokenPage({
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
+                    <FormLabel>Passwort wiederholen</FormLabel>
                     <FormControl>
                       <Input {...field} type="password" />
                     </FormControl>
@@ -137,7 +137,7 @@ export default function ResetPasswordTokenPage({
                 )}
               />
               <Button type="submit" className="w-full">
-                Reset Password
+                Passwort ändern
               </Button>
             </form>
           </Form>

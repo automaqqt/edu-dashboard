@@ -71,9 +71,9 @@ export function LoginForm() {
   }
 
   return (
-    <div className="grid gap-6 text-black">
+    <div className="grid gap-6">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 text-black">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 text-white">
           <FormField
             control={form.control}
             name="email"

@@ -10,7 +10,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="h-full relative">
       {/* Desktop Sidebar */}
-      <div className="hidden h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0 z-[80] bg-gray-900">
+      <div className="hidden h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0 z-[80]">
         <Sidebar />
       </div>
       
@@ -20,7 +20,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="border-b">
             <div className="flex h-16 items-center px-4">
               <MobileSidebar />
-              <div className="ml-auto flex items-center space-x-4">
+              <div className="ml-auto flex items-center space-x-4 ">
                 <UserNav />
               </div>
             </div>

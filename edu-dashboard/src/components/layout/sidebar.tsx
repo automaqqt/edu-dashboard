@@ -126,15 +126,15 @@ export function Sidebar() {
       </div>
       
       {/* Violet sidebar content */}
-      <div className="flex-1 bg-violet-900 py-4">
+      <div className="flex-1 py-4" style={{backgroundColor:'#781581'}}>
         <div className="px-3 py-2 space-y-1">
           {routes.map((route) => (
             <Link
               key={route.href}
               href={route.href}
               className={cn(
-                "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-violet-800 rounded-lg transition",
-                pathname === route.href ? "text-white bg-violet-800" : "text-violet-100"
+                "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-fuchsia-700 rounded-lg transition",
+                pathname === route.href ? "text-white bg-fuchsia-800" : "text-violet-100"
               )}
             >
               <div className="flex items-center flex-1">
