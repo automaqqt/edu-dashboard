@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { db } from "@/lib/db"
 import fs from "fs"
+import path from "path"
 
 export async function POST(req: Request) {
   try {
@@ -15,11 +16,11 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { title, fileUrl, teacherIds } = body
 
-    // Get file size
-    const filePath = `public${fileUrl}`
+    // Get file size - updated path
+    const fileName = fileUrl.split('/').pop()
+    const filePath = path.join('/var/www/uploads', fileName)
     const stats = fs.statSync(filePath)
     const fileSize = stats.size
-
 
     const document = await db.document.createMany({
       data: teacherIds.map((teacherId: number) => {return {

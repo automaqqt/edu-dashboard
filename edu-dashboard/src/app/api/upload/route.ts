@@ -49,15 +49,9 @@ export async function POST(req: Request) {
     const randomName = crypto.randomBytes(16).toString('hex')
     const fileName = randomName + fileExtension
 
-    // Ensure uploads directory exists
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-    try {
-      await fs.promises.mkdir(uploadDir, { recursive: true })
-    } catch (error) {
-      console.error("Failed to create upload directory:", error)
-      return new NextResponse("Internal Server Error", { status: 500 })
-    }
-
+    // New upload directory
+    const uploadDir = '/var/www/uploads'
+    
     // Save file
     const filePath = path.join(uploadDir, fileName)
     const bytes = await file.arrayBuffer()

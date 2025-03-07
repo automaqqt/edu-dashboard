@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { db } from "@/lib/db"
 import fs from "fs"
+import path from "path"
 
 export async function POST(req: Request) {
     try {
@@ -22,8 +23,9 @@ export async function POST(req: Request) {
         })
       }
   
-      // Get file size from the uploaded file
-      const filePath = `public${fileUrl}`
+      // Get file size from the uploaded file - updated path
+      const fileName = fileUrl.split('/').pop()
+      const filePath = path.join('/var/www/uploads', fileName)
       const stats = fs.statSync(filePath)
       const fileSize = stats.size
   

@@ -54,9 +54,9 @@ export async function POST(req: Request) {
 
     // Send email
     await resend.emails.send({
-      from: "EduDashboard <onboarding@resend.dev>",
+      from: "Miteinandermatt <noreply@board.miteinandermatt.de>",
       to: email,
-      subject: "Reset Your Password",
+      subject: "Setze dein Passwort zurück",
       react: ResetPasswordEmail({ resetUrl }),
     })
 
