@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
     // Get file size - updated path
     const fileName = fileUrl.split('/').pop()
-    const filePath = path.join(process.env.UPLOAD_DIR, fileName)
+    const filePath = path.join(process.env.UPLOAD_DIR ? process.env.UPLOAD_DIR : '/var/www/uploads', fileName)
     const stats = fs.statSync(filePath)
     const fileSize = stats.size
 
