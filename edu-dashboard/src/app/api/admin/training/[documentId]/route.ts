@@ -29,7 +29,7 @@ export async function DELETE(
 
     // Delete the file from storage
     try {
-      const filePath = path.join(process.cwd(), "public", document.fileUrl)
+      const filePath = path.join(process.env.UPLOAD_DIR ? process.env.UPLOAD_DIR : '/var/www/uploads', document.fileUrl)
       await fs.unlink(filePath)
     } catch (error) {
       console.error("Error deleting file:", error)

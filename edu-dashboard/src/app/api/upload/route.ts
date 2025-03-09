@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     const fileName = randomName + fileExtension
 
     // New upload directory
-    const uploadDir = '/var/www/uploads'
+    const uploadDir = process.env.UPLOAD_DIR ? process.env.UPLOAD_DIR : '/var/www/uploads'
     
     // Save file
     const filePath = path.join(uploadDir, fileName)
