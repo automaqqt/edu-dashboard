@@ -39,7 +39,6 @@ export async function DELETE(
     // Delete the document from the database
     await db.document.delete({
       where: {
-        userId: session.user.id,
         id: params.documentId
       }
     })
