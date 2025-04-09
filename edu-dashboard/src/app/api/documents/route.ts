@@ -46,11 +46,7 @@ export async function GET(req: Request) {
       where: {
         OR: [
           {
-            type: "SHARED_ADMIN"
-          },
-          {
             userId: session.user.id,
-            type: typeParam || "PERSONAL"
           }
         ]
       },
